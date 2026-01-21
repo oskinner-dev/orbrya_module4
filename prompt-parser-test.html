@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PromptParser Test - Orbrya Module 4</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f1629;
+            color: #e4e4e7;
+            padding: 40px;
+            margin: 0;
+        }
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+        .test-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        input {
+            flex: 1;
+            padding: 15px;
+            font-size: 16px;
+            background: #1a2744;
+            border: 2px solid #2d3748;
+            border-radius: 8px;
+            color: #e4e4e7;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .results {
+            background: #1a2744;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .results h3 {
+            margin-top: 0;
+            color: #667eea;
+        }
+        .param-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .param-card {
+            background: #0f1629;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .param-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00ff88;
+        }
+        .param-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+        }
+        .specificity-bar {
+            height: 20px;
+            background: #2d3748;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .specificity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff4757 0%, #ffc107 50%, #00ff88 100%);
+            transition: width 0.3s;
+        }
+        .feedback {
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        .suggestions {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #ffc107;
+        }
+        .examples {
+            margin-top: 30px;
+        }
+        .examples h3 {
+            color: #667eea;
+        }
+        .example-btn {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px;
+            background: #2d3748;
+            border: none;
+            border-radius: 6px;
+            color: #e4e4e7;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .example-btn:hover {
+            background: #3d4f68;
+        }
+        .test-suite {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #2d3748;
+        }
+        .test-result {
+            padding: 8px 15px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+        .test-pass {
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid #00ff88;
+        }
+        .test-fail {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 3px solid #ff4757;
+        }
+        .summary {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a2744;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 PromptParser Test</h1>
+    <p class="subtitle">Module 4: Natural Language Prompt Parsing</p>
+    
+    <div class="test-input">
+        <input type="text" id="prompt-input" placeholder="Try a prompt: 'Create 50 pine trees in a grid'" />
+        <button onclick="testPrompt()">Parse</button>
+    </div>
+    
+    <div class="results" id="results">
+        <h3>📊 Parse Results</h3>
+        <p style="color: #888;">Enter a prompt above to see parsing results...</p>
+    </div>
+    
+    <div class="examples">
+        <h3>💡 Example Prompts</h3>
+        <div id="example-buttons"></div>
+    </div>
+    
+    <div class="test-suite">
+        <h3>🔬 Run Full Test Suite</h3>
+        <button onclick="runTests()">Run All Tests</button>
+        <div id="test-results"></div>
+    </div>
+
+    <script type="module">
+        import { PromptParser } from './src/engine/PromptParser.js';
+        
+        const parser = new PromptParser();
+        window.parser = parser; // For console access
+        
+        // Populate example buttons
+        const examples = parser.getExamplePrompts();
+        const exampleContainer = document.getElementById('example-buttons');
+        examples.forEach(ex => {
+            const btn = document.createElement('button');
+            btn.className = 'example-btn';
+            btn.textContent = ex.text;
+            btn.title = ex.description;
+            btn.onclick = () => {
+                document.getElementById('prompt-input').value = ex.text;
+                testPrompt();
+            };
+            exampleContainer.appendChild(btn);
+        });
+        
+        // Test a single prompt
+        window.testPrompt = function() {
+            const input = document.getElementById('prompt-input').value;
+            if (!input.trim()) return;
+            
+            const result = parser.parsePrompt(input);
+            displayResults(result);
+        };
+        
+        function displayResults(result) {
+            const container = document.getElementById('results');
+            const p = result.params;
+            const f = result.feedback;
+            
+            container.innerHTML = `
+                <h3>📊 Parse Results</h3>
+                
+                <div class="param-grid">
+                    <div class="param-card">
+                        <div class="param-value">${p.treeCount}</div>
+                        <div class="param-label">Tree Count</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-value">${p.treeType}</div>
+                        <div class="param-label">Tree Type</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-value">${p.arrangement}</div>
+                        <div class="param-label">Arrangement</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-value">${p.density}</div>
+                        <div class="param-label">Density</div>
+                    </div>
+                    <div class="param-card">
+                        <div class="param-value">${p.sizeVariation ? 'Yes' : 'No'}</div>
+                        <div class="param-label">Size Variation</div>
+                    </div>
+                </div>
+                
+                <h4>🎯 Specificity Score: ${result.specificity}/100</h4>
+                <div class="specificity-bar">
+                    <div class="specificity-fill" style="width: ${result.specificity}%"></div>
+                </div>
+                
+                <h4>📝 Interpretation</h4>
+                <p>${result.interpretation}</p>
+                
+                <div class="feedback">
+                    <strong>${f.message}</strong>
+                    ${f.suggestions.length > 0 ? `
+                        <div class="suggestions">
+                            ${f.suggestions.map(s => `<div>💡 ${s}</div>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        // Run full test suite
+        window.runTests = async function() {
+            const { runPromptParserTests } = await import('./src/engine/PromptParser.test.js');
+            const results = runPromptParserTests();
+            
+            const container = document.getElementById('test-results');
+            let html = '';
+            
+            results.results.forEach((r, i) => {
+                const cls = r.passed ? 'test-pass' : 'test-fail';
+                const icon = r.passed ? '✅' : '❌';
+                html += `<div class="test-result ${cls}">
+                    ${icon} "${r.prompt.substring(0, 50)}${r.prompt.length > 50 ? '...' : ''}"
+                    ${r.failures.length > 0 ? `<br><small style="color:#ff4757">${r.failures.join(', ')}</small>` : ''}
+                </div>`;
+            });
+            
+            const pct = Math.round(results.passed / results.total * 100);
+            const color = pct >= 80 ? '#00ff88' : pct >= 60 ? '#ffc107' : '#ff4757';
+            
+            html += `<div class="summary" style="color: ${color}">
+                Results: ${results.passed}/${results.total} passed (${pct}%)
+            </div>`;
+            
+            container.innerHTML = html;
+        };
+        
+        // Handle Enter key
+        document.getElementById('prompt-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') testPrompt();
+        });
+        
+        console.log('[PromptParser Test] Ready! Access parser via window.parser');
+    </script>
+</body>
+</html>

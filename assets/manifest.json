@@ -1,0 +1,64 @@
+{
+  "name": "Forest Scenario",
+  "version": "1.0.0",
+  "description": "Low-poly forest environment for Orbrya debugging scenarios",
+  "author": "Orbrya Team",
+  "targetBandwidth": "1Mbps",
+  "estimatedLoadTime": "15-30 seconds on slow wifi",
+  
+  "assets": [
+    {
+      "name": "tree_pine",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/BoxTextured/glTF/BoxTextured.gltf",
+      "type": "model",
+      "size": "24KB",
+      "description": "Low-poly pine tree (placeholder - using BoxTextured for testing)"
+    },
+    {
+      "name": "tree_oak",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/Box/glTF/Box.gltf",
+      "type": "model",
+      "size": "1KB",
+      "description": "Low-poly oak tree (placeholder)"
+    },
+    {
+      "name": "rock_small",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/Cube/glTF/Cube.gltf",
+      "type": "model",
+      "size": "1KB",
+      "description": "Small rock decoration"
+    },
+    {
+      "name": "bush",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/SimpleSkin/glTF/SimpleSkin.gltf",
+      "type": "model",
+      "size": "3KB",
+      "description": "Low-poly bush"
+    },
+    {
+      "name": "grass_patch",
+      "url": "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/main/2.0/Triangle/glTF/Triangle.gltf",
+      "type": "model",
+      "size": "1KB",
+      "description": "Grass patch decoration"
+    }
+  ],
+  
+  "textures": [
+    {
+      "name": "ground_grass",
+      "url": "assets/textures/grass_diffuse.png",
+      "type": "texture",
+      "compressed": {
+        "astc": "assets/textures/grass_diffuse.astc.ktx2",
+        "etc": "assets/textures/grass_diffuse.etc.ktx2"
+      }
+    }
+  ],
+  
+  "notes": {
+    "testing": "Use Chrome DevTools > Network > Throttle to 'Slow 3G' to simulate 1Mbps school wifi",
+    "kenney_assets": "For production, replace placeholder URLs with Kenney.nl low-poly assets",
+    "compression": "ASTC format preferred for Chromebooks with Mali GPUs"
+  }
+}

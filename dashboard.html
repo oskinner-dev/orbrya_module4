@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Orbrya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-darkest: #0d0d1a;
+            --bg-dark: #1a1a2e;
+            --bg-panel: #16213e;
+            --bg-card: #1f2b47;
+            --accent-primary: #667eea;
+            --accent-secondary: #764ba2;
+            --success: #00ff88;
+            --warning: #ffa500;
+            --error: #ff4757;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: #2d3748;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+        html, body {
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-darkest);
+            color: var(--text-primary);
+        }
+
+        body {
+            background: 
+                radial-gradient(ellipse at 20% 20%, rgba(102, 126, 234, 0.12) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(118, 75, 162, 0.12) 0%, transparent 50%),
+                linear-gradient(180deg, var(--bg-darkest) 0%, #0f0f1f 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(22, 33, 62, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--success) 0%, #00d4aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .welcome-text strong {
+            color: var(--text-primary);
+        }
+
+        .sign-out-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .sign-out-btn:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+
+        /* Main content */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        /* Continue section */
+        .continue-section {
+            margin-bottom: 48px;
+        }
+
+        .continue-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .continue-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            border-color: var(--accent-primary);
+        }
+
+        .continue-info h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+
+        .continue-info h3 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .continue-info .scenario-meta {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .continue-progress {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .progress-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-circle .bg {
+            fill: none;
+            stroke: var(--bg-darkest);
+            stroke-width: 8;
+        }
+
+        .progress-circle .progress {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 8;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .continue-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Section headers */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+
+        /* Scenario grid */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .scenario-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scenario-card:hover:not(.locked) {
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3),
+                        0 0 40px rgba(102, 126, 234, 0.1);
+        }
+
+        .scenario-card.locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .scenario-card.completed {
+            border-color: var(--success);
+        }
+
+
+        .scenario-card.in-progress {
+            border-color: var(--warning);
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .card-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+
+        .status-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.completed {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.in-progress {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-badge.locked {
+            background: rgba(113, 113, 122, 0.2);
+            color: var(--text-muted);
+        }
+
+        .lock-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            opacity: 0.3;
+        }
+
+
+        /* Progress bar in cards */
+        .card-progress {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-darkest);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--success));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Stats section */
+        .stats-section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 24px;
+        }
+
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--success) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Hidden state for continue section */
+        .continue-section.hidden {
+            display: none;
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .header-left {
+                flex-direction: column;
+            }
+
+            .continue-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+
+            .continue-progress {
+                flex-direction: column;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 24px 16px;
+            }
+        }
+
+        /* Animation for cards loading */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scenario-card {
+            animation: fadeInUp 0.4s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .scenario-card:nth-child(1) { animation-delay: 0.1s; }
+        .scenario-card:nth-child(2) { animation-delay: 0.15s; }
+        .scenario-card:nth-child(3) { animation-delay: 0.2s; }
+        .scenario-card:nth-child(4) { animation-delay: 0.25s; }
+        .scenario-card:nth-child(5) { animation-delay: 0.3s; }
+    </style>
+</head>
+<body>
+
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">ORBRYA</div>
+            <div class="welcome-text">
+                Welcome back, <strong id="user-name">Student</strong>!
+            </div>
+        </div>
+        <button class="sign-out-btn" id="sign-out-btn">Sign Out</button>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Continue Section (hidden if no scenario in progress) -->
+        <section class="continue-section hidden" id="continue-section">
+            <div class="continue-card" id="continue-card">
+                <div class="continue-info">
+                    <h2>Continue Learning</h2>
+                    <h3 id="continue-scenario-name">Infinite Forest</h3>
+                    <div class="scenario-meta">
+                        <span id="continue-scenario-meta">Beginner • 15-20 min</span>
+                    </div>
+                </div>
+                <div class="continue-progress">
+                    <div class="progress-circle">
+                        <svg width="80" height="80" viewBox="0 0 80 80">
+                            <circle class="bg" cx="40" cy="40" r="34"/>
+                            <circle class="progress" cx="40" cy="40" r="34" 
+                                stroke-dasharray="213.6" 
+                                stroke-dashoffset="213.6"
+                                id="continue-progress-circle"/>
+                        </svg>
+                        <span class="progress-text" id="continue-progress-text">0%</span>
+                    </div>
+                    <button class="continue-btn">Resume →</button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- Available Scenarios -->
+        <section class="scenarios-section">
+            <div class="section-header">
+                <h2 class="section-title">Available Scenarios</h2>
+            </div>
+            <div class="scenario-grid" id="scenario-grid">
+                <!-- Populated by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Progress</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-completed">0/5</div>
+                    <div class="stat-label">Scenarios Completed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-time">0m</div>
+                    <div class="stat-label">Time Learning</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-streak">0</div>
+                    <div class="stat-label">Day Streak 🔥</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+
+    <script type="module">
+        import { AuthManager } from './src/portal/AuthManager.js';
+        import { StudentPortal } from './src/portal/StudentPortal.js';
+
+        // Check authentication
+        if (!AuthManager.isLoggedIn()) {
+            window.location.href = 'login.html';
+        }
+
+        // Get current user
+        const user = AuthManager.getCurrentUser();
+        document.getElementById('user-name').textContent = user.displayName;
+
+        // Sign out handler
+        document.getElementById('sign-out-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to sign out?')) {
+                AuthManager.logout();
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Load and render scenarios
+        function renderDashboard() {
+            const scenarios = StudentPortal.getScenariosWithStatus();
+            const currentScenario = StudentPortal.getCurrentScenario();
+            const stats = StudentPortal.getStats();
+
+            // Update continue section
+            const continueSection = document.getElementById('continue-section');
+            if (currentScenario) {
+                continueSection.classList.remove('hidden');
+                document.getElementById('continue-scenario-name').textContent = 
+                    `${currentScenario.icon} ${currentScenario.name}`;
+                document.getElementById('continue-scenario-meta').textContent = 
+                    `${currentScenario.difficulty} • ${currentScenario.estimatedTime}`;
+                document.getElementById('continue-progress-text').textContent = 
+                    `${currentScenario.progress}%`;
+
+
+                // Update progress circle
+                const circumference = 2 * Math.PI * 34; // r=34
+                const offset = circumference - (currentScenario.progress / 100) * circumference;
+                document.getElementById('continue-progress-circle').style.strokeDashoffset = offset;
+
+                // Continue card click handler
+                document.getElementById('continue-card').onclick = () => {
+                    window.location.href = StudentPortal.getScenarioUrl(currentScenario.id);
+                };
+            } else {
+                continueSection.classList.add('hidden');
+            }
+
+            // Render scenario cards
+            const grid = document.getElementById('scenario-grid');
+            grid.innerHTML = scenarios.map(scenario => {
+                const statusClass = scenario.isLocked ? 'locked' : 
+                                   scenario.isCompleted ? 'completed' : 
+                                   scenario.isInProgress ? 'in-progress' : '';
+                
+                const statusBadge = scenario.isLocked ? '<span class="status-badge locked">🔒 Locked</span>' :
+                                   scenario.isCompleted ? '<span class="status-badge completed">✅ Completed</span>' :
+                                   scenario.isInProgress ? `<span class="status-badge in-progress">${scenario.progress > 0 ? scenario.progress + '% Done' : 'Started'}</span>` : '';
+
+                const progressLabel = scenario.progress > 0 ? `${scenario.progress}% complete` : 'Just started';
+                const progressWidth = Math.max(scenario.progress, scenario.isInProgress ? 5 : 0); // Min 5% width when in progress
+                const progressBar = scenario.isInProgress || scenario.isCompleted ? `
+                    <div class="card-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progressWidth}%"></div>
+                        </div>
+                        <div class="progress-label">${progressLabel}</div>
+                    </div>
+                ` : '';
+
+
+                return `
+                    <div class="scenario-card ${statusClass}" data-id="${scenario.id}">
+                        ${statusBadge}
+                        <div class="card-icon">${scenario.icon}</div>
+                        <h3 class="card-title">${scenario.name}</h3>
+                        <p class="card-description">${scenario.description}</p>
+                        <div class="card-meta">
+                            <span>📊 ${scenario.difficulty}</span>
+                            <span>⏱️ ${scenario.estimatedTime}</span>
+                        </div>
+                        ${progressBar}
+                        ${scenario.isLocked ? '<div class="lock-icon">🔒</div>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Add click handlers to cards
+            document.querySelectorAll('.scenario-card:not(.locked)').forEach(card => {
+                card.addEventListener('click', () => {
+                    const scenarioId = card.dataset.id;
+                    StudentPortal.startScenario(scenarioId);
+                    window.location.href = StudentPortal.getScenarioUrl(scenarioId);
+                });
+            });
+
+            // Update stats
+            const totalScenarios = StudentPortal.SCENARIOS.length;
+            document.getElementById('stat-completed').textContent = 
+                `${stats.totalCompleted}/${totalScenarios}`;
+            document.getElementById('stat-time').textContent = 
+                StudentPortal.formatTime(stats.totalTime);
+            document.getElementById('stat-streak').textContent = 
+                stats.streak;
+        }
+
+        // Initial render
+        renderDashboard();
+    </script>
+</body>
+</html>

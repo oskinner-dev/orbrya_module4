@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Orbrya Engine - AI Workforce Readiness Platform</title>
+    <link rel="stylesheet" href="css/panels.css">
+    <style>
+        /* Inline critical styles for fast loading */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #0d0d1a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+        #loading-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        #loading-overlay .logo {
+            font-size: 48px;
+            font-weight: 700;
+            color: #00ff88;
+            letter-spacing: 8px;
+            margin-bottom: 30px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        #loading-overlay .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #2d3748;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #loading-overlay .status {
+            margin-top: 20px;
+            color: #71717a;
+            font-size: 12px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="logo">ORBRYA</div>
+        <div class="spinner"></div>
+        <div class="status">Initializing engine...</div>
+    </div>
+
+
+    <!-- Main Application Container -->
+    <div id="app-container">
+        <!-- Top Toolbar -->
+        <div id="top-toolbar">
+            <a href="dashboard.html" class="toolbar-btn" id="btn-back" title="Back to Dashboard" style="text-decoration: none;">← Dashboard</a>
+            <span class="logo">ORBRYA</span>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="btn-new">New</button>
+                <button class="toolbar-btn" id="btn-open">Open</button>
+                <button class="toolbar-btn" id="btn-save">Save</button>
+            </div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn active" id="btn-play">▶ Play</button>
+                <button class="toolbar-btn" id="btn-pause">⏸ Pause</button>
+            </div>
+            <div class="toolbar-group" style="margin-left: auto;">
+                <button class="toolbar-btn" id="btn-layout">Layout</button>
+                <button class="toolbar-btn" id="btn-help">Help</button>
+            </div>
+        </div>
+
+        <!-- Main Workspace (Panels go here) -->
+        <div id="workspace"></div>
+
+        <!-- Status Bar -->
+        <div id="status-bar">
+            <div class="status-item">
+                <span class="status-dot"></span>
+                <span>Ready</span>
+            </div>
+            <div class="status-item">
+                <span>N4000 Optimized</span>
+            </div>
+            <div class="status-item">
+                <span id="status-trees">Trees: 25</span>
+            </div>
+            <div class="status-item">
+                <span id="status-fps">FPS: --</span>
+            </div>
+            <div class="status-item" style="margin-left:auto; color:#667eea;">
+                <span>S=Start R=Reset H=Hint T=Trees L=Lite</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Help Overlay -->
+    <div id="keyboard-help" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+        background:rgba(22,33,62,0.95); backdrop-filter:blur(10px); padding:30px; border-radius:12px;
+        border:1px solid #667eea; z-index:10001; font-family:'Segoe UI',sans-serif; color:#e4e4e7;">
+        <h3 style="margin:0 0 20px; color:#00ff88;">⌨️ Keyboard Shortcuts</h3>
+        <table style="border-collapse:collapse; font-size:14px;">
+            <tr><td style="padding:8px; color:#667eea;">S</td><td style="padding:8px;">Start Scenario</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">R</td><td style="padding:8px;">Reset Scenario</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">H</td><td style="padding:8px;">Show Hint / Toggle Help</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">T</td><td style="padding:8px;">Cycle Tree Count</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">L</td><td style="padding:8px;">Lite Mode (hide panels)</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">P</td><td style="padding:8px;">Toggle Profiler</td></tr>
+            <tr><td style="padding:8px; color:#667eea;">F11</td><td style="padding:8px;">Maximize Viewport</td></tr>
+        </table>
+        <p style="margin:20px 0 0; font-size:12px; color:#71717a;">Press H to close</p>
+    </div>
+
+    <!-- Completion Modal -->
+    <div id="completion-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; 
+        background:rgba(0,0,0,0.8); z-index:10002; align-items:center; justify-content:center;">
+        <div style="background:linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); padding:40px; border-radius:20px;
+            border:2px solid #00ff88; text-align:center; max-width:400px; font-family:'Segoe UI',sans-serif;">
+            <div style="font-size:64px; margin-bottom:20px;">🎉</div>
+            <h2 style="color:#00ff88; margin:0 0 10px; font-size:28px;">Scenario Complete!</h2>
+            <p id="completion-message" style="color:#e4e4e7; margin:0 0 20px; font-size:16px;">
+                Great job fixing the bug!
+            </p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button id="completion-dashboard" style="padding:12px 24px; background:#667eea; color:white; 
+                    border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600;">
+                    ← Back to Dashboard
+                </button>
+                <button id="completion-continue" style="padding:12px 24px; background:#00ff88; color:#0d0d1a; 
+                    border:none; border-radius:8px; cursor:pointer; font-size:14px; font-weight:600;">
+                    Continue Exploring →
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <!-- Main Application Entry Point -->
+    <script type="module" src="src/main.js"></script>
+
+    <!-- Keyboard shortcuts info (tooltip) -->
+    <script>
+        // Update status bar with tree count and FPS (1s interval for performance)
+        setInterval(() => {
+            if (window.orbrya?.sceneController) {
+                const sc = window.orbrya.sceneController;
+                document.getElementById('status-trees').textContent = `Trees: ${sc.currentTreeCount}`;
+                document.getElementById('status-fps').textContent = `FPS: ${sc.currentFps}`;
+            }
+        }, 1000);
+
+        // Help overlay toggle
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'h' || e.key === 'H') {
+                const help = document.getElementById('keyboard-help');
+                help.style.display = help.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+        
+        // Completion modal handlers
+        document.getElementById('completion-dashboard').addEventListener('click', () => {
+            window.location.href = 'dashboard.html';
+        });
+        
+        document.getElementById('completion-continue').addEventListener('click', () => {
+            document.getElementById('completion-modal').style.display = 'none';
+        });
+        
+        // Global function to show completion modal
+        window.showCompletionModal = function(message) {
+            const modal = document.getElementById('completion-modal');
+            const msgEl = document.getElementById('completion-message');
+            if (message) msgEl.textContent = message;
+            modal.style.display = 'flex';
+        };
+
+        // Log system info
+        console.log('[System] User Agent:', navigator.userAgent);
+        if (navigator.deviceMemory) {
+            console.log('[System] Device Memory:', navigator.deviceMemory, 'GB');
+        }
+        if (navigator.hardwareConcurrency) {
+            console.log('[System] CPU Cores:', navigator.hardwareConcurrency);
+        }
+    </script>
+</body>
+</html>
+

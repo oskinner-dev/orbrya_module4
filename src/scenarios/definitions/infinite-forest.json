@@ -1,0 +1,226 @@
+{
+  "id": "infinite-forest",
+  "name": "The Infinite Forest",
+  "difficulty": "beginner",
+  "estimatedTime": "15-20 min",
+  
+  "story": {
+    "intro": "🌲 THE INFINITE FOREST 🌲\n\nWelcome to the Forest Simulation! I'm the AI assistant who built this environment.\n\n⚠️ WARNING: Watch the console - my buggy code is about to run!\n\nI made a mistake in my tree-spawning loop. It has no exit condition, so it just keeps going and going... Watch as the trees multiply and the FPS crashes!\n\nYour mission: Find the bug in my code and fix it before the forest overwhelms everything.",
+    
+    "problem": "The loop runs forever with 'while (true)', spawning trees endlessly! Watch the console - you can see each batch of trees being created. This is called an INFINITE LOOP - one of the most common and dangerous bugs in programming. It will keep running until it crashes or uses all available memory.",
+    
+    "goal": "Add a proper stopping condition to the while loop so the forest has a reasonable number of trees (around 50) and runs smoothly at 45+ FPS.",
+    
+    "hint": "💡 HINT: Look at the while loop condition.\n\"while (true)\" means \"loop forever\" - that's the bug!\nTry changing it to \"while (treeCount < 50)\" to limit the trees.",
+    
+    "success": "🎉 EXCELLENT WORK!\n\nYou fixed the infinite loop! The forest now has a controlled number of trees and the game runs smoothly.\n\n📊 What You Learned:\n• Infinite loops can destroy performance in real-time applications\n• Every loop MUST have an exit condition\n• Visual debugging makes performance problems obvious\n• Always verify that loop conditions will eventually become false\n\nYou're becoming a great AI code auditor!",
+    
+    "failure": "🔄 Not quite right yet!\n\nThe game is still lagging. Make sure your loop has a proper exit condition.\n\n💡 Remember: The loop needs to STOP at some point.\nTry: while (treeCount < 50)"
+  },
+  
+  "code": {
+    "language": "csharp",
+    "template": "// ════════════════════════════════════════════\n// 🤖 AI GENERATED CODE - Contains Bug!\n// ════════════════════════════════════════════\n//\n// The AI was asked to \"create a forest scene\"\n// but it made a critical mistake...\n//\n// ════════════════════════════════════════════\n\nusing Orbrya.Engine;\n\npublic class ForestGenerator : ScenarioBase\n{\n    private int treeCount = 0;\n\n    public void PopulateForest()\n    {\n        // AI's comment: \"I'll spawn trees until the \n        // forest looks full enough!\"\n        \n        treeCount = 0;\n        \n        // ╔══════════════════════════════════════════╗\n        // ║  🔴 BUG FOUND! FIX THE LINE BELOW!       ║\n        // ╚══════════════════════════════════════════╝\n        \n        while (true)  // ← ❌ INFINITE LOOP!\n        {\n            SpawnTree();\n            treeCount++;\n        }\n        \n        // ════════════════════════════════════════════\n        // 💡 HINT: Replace \"true\" with a condition\n        // ✅ Example: while (treeCount < 50)\n        // ════════════════════════════════════════════\n        \n        Debug.Log($\"Forest complete: {treeCount} trees\");\n    }\n}",
+    
+    "correctSolution": "while (treeCount < 50)",
+    
+    "acceptablePatterns": [
+      {
+        "pattern": "treeCount\\s*<\\s*(\\d+)",
+        "feedback": "Great! You added a proper loop limit.",
+        "minValue": 10,
+        "maxValue": 175
+      },
+      {
+        "pattern": "treeCount\\s*<=\\s*(\\d+)",
+        "feedback": "Good use of the <= operator!",
+        "minValue": 10,
+        "maxValue": 174
+      },
+      {
+        "pattern": "(\\d+)\\s*>\\s*treeCount",
+        "feedback": "Clever! You reversed the comparison.",
+        "minValue": 10,
+        "maxValue": 175
+      },
+      {
+        "pattern": "treeCount\\s*!=\\s*(\\d+)",
+        "feedback": "Using != works, but < is safer for loops!",
+        "minValue": 10,
+        "maxValue": 175
+      }
+    ]
+  },
+
+  "hints": [
+    {
+      "level": 1,
+      "delaySeconds": 60,
+      "text": "🤔 Look at line 27. What happens when a while loop has 'true' as its condition? It never stops!",
+      "trigger": "time"
+    },
+    {
+      "level": 2,
+      "delaySeconds": 120,
+      "text": "💡 You need to replace 'true' with a condition that checks the tree count. Think: 'while treeCount is less than some number...'",
+      "trigger": "time"
+    },
+    {
+      "level": 3,
+      "delaySeconds": 180,
+      "text": "✅ Try this: while (treeCount < 50). This tells the loop to stop after 50 trees are spawned.",
+      "trigger": "time"
+    },
+    {
+      "level": 0,
+      "delaySeconds": 0,
+      "text": "📊 Watch the FPS counter! When it drops below 30, that's your signal that something is wrong with the code.",
+      "trigger": "fps_critical"
+    }
+  ],
+  
+  "validation": {
+    "initialTreeCount": 500,
+    "targetTreeCount": 50,
+    "acceptableRange": {
+      "min": 10,
+      "max": 175
+    },
+    "targetFPS": 45,
+    "minimumFPS": 30,
+    "brokenFPS": 15,
+    "checkpoints": [
+      {
+        "id": "inspect_code",
+        "type": "action",
+        "description": "Student clicked 'Inspect AI Code'",
+        "required": true
+      },
+      {
+        "id": "code_modified",
+        "type": "code_edit",
+        "description": "Student modified the loop condition",
+        "required": true
+      },
+      {
+        "id": "code_applied",
+        "type": "action",
+        "description": "Student clicked 'Apply Fix' or 'Run'",
+        "required": true
+      },
+      {
+        "id": "fps_improved",
+        "type": "fps_improvement",
+        "description": "FPS improved from <20 to >45",
+        "threshold": 45
+      },
+      {
+        "id": "tree_count_valid",
+        "type": "object_count",
+        "description": "Tree count is within acceptable range (10-175)",
+        "range": [10, 175]
+      },
+      {
+        "id": "scenario_complete",
+        "type": "completion",
+        "description": "All success criteria met",
+        "required": true
+      }
+    ]
+  },
+
+  "learningObjectives": [
+    {
+      "id": "lo-1",
+      "objective": "Understand how infinite loops impact performance in real-time applications",
+      "standard": "CSTA 2-AP-17",
+      "description": "Students recognize that loops without proper exit conditions consume CPU resources indefinitely"
+    },
+    {
+      "id": "lo-2",
+      "objective": "Write proper loop exit conditions using comparison operators",
+      "standard": "CSTA 2-AP-12",
+      "description": "Students modify while loop conditions using <, <=, >, >=, or != operators"
+    },
+    {
+      "id": "lo-3",
+      "objective": "Use visual debugging tools (profiler, FPS counter) to identify performance issues",
+      "standard": "CSTA 2-AP-18",
+      "description": "Students interpret real-time performance metrics to diagnose code problems"
+    },
+    {
+      "id": "lo-4",
+      "objective": "Debug systematically by identifying, isolating, and fixing code bugs",
+      "standard": "CSTA 2-AP-19",
+      "description": "Students follow a debugging workflow: observe problem → inspect code → apply fix → verify result"
+    },
+    {
+      "id": "lo-5",
+      "objective": "Audit AI-generated code for common errors and fix them",
+      "standard": "ISTE 1.5",
+      "description": "Students develop critical thinking skills for evaluating and improving AI output"
+    }
+  ],
+  
+  "metadata": {
+    "tags": [
+      "loops",
+      "infinite-loop",
+      "performance",
+      "debugging",
+      "conditionals",
+      "comparison-operators",
+      "ai-literacy",
+      "beginner"
+    ],
+    "prerequisite": null,
+    "nextScenario": "memory-leak-manor",
+    "relatedScenarios": ["draw-call-dungeon", "physics-chaos"],
+    "author": "Orbrya Team",
+    "version": "1.0.0",
+    "created": "2025-12-01",
+    "lastUpdated": "2025-12-30",
+    "targetGrades": ["6", "7", "8", "9", "10", "11", "12"],
+    "standards": {
+      "csta": ["2-AP-12", "2-AP-17", "2-AP-18", "2-AP-19"],
+      "iste": ["1.5", "1.6"],
+      "perkinsV": ["Systems Architecture", "Software Quality Assurance"],
+      "digcomp": ["3.4", "5.1"]
+    },
+    "assessmentType": "formative",
+    "scaffolding": {
+      "visual": true,
+      "hints": true,
+      "progressiveDisclosure": true
+    }
+  },
+  
+  "assets": {
+    "trees": {
+      "prefab": "LowPolyTree",
+      "material": "MeshLambertMaterial",
+      "instanced": true,
+      "lod": false
+    },
+    "terrain": {
+      "type": "flat",
+      "size": [100, 100],
+      "material": "grass_basic"
+    },
+    "skybox": "gradient_blue",
+    "lighting": {
+      "ambient": 0.4,
+      "directional": 0.8,
+      "shadows": false
+    }
+  },
+  
+  "performance": {
+    "targetHardware": "Intel Celeron N4000",
+    "targetRAM": "4GB",
+    "maxDrawCalls": 50,
+    "maxMemoryMB": 400,
+    "useGPUInstancing": true,
+    "useObjectPooling": true
+  }
+}

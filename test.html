@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orbrya - N4000 Performance Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 100%);
+            color: #e4e4e7;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            height: 100vh;
+        }
+        
+        /* 3D Viewport */
+        #viewport {
+            position: relative;
+            background: #0a0a14;
+        }
+        
+        #viewport canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        
+        /* FPS Overlay */
+        .fps-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(22, 33, 62, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px 30px;
+            border-radius: 16px;
+            border: 2px solid #667eea;
+            text-align: center;
+        }
+        
+        .fps-value {
+            font-size: 72px;
+            font-weight: 700;
+            font-family: 'Consolas', monospace;
+            line-height: 1;
+            transition: color 0.3s;
+        }
+        
+        .fps-label {
+            font-size: 14px;
+            color: #71717a;
+            margin-top: 5px;
+        }
+        
+        .fps-green { color: #00ff88; }
+        .fps-yellow { color: #ffa500; }
+        .fps-red { color: #ff4757; }
+        
+        /* Side Panel */
+        .side-panel {
+            background: rgba(22, 33, 62, 0.95);
+            padding: 20px;
+            border-left: 1px solid #2d3748;
+            overflow-y: auto;
+        }
+        
+        .side-panel h1 {
+            font-size: 24px;
+            color: #00ff88;
+            margin-bottom: 5px;
+        }
+        
+        .side-panel .subtitle {
+            color: #71717a;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        
+        /* Tree Count Display */
+        .tree-count {
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid #667eea;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .tree-count .value {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .tree-count .label {
+            font-size: 12px;
+            color: #71717a;
+        }
+        
+        /* Instructions */
+        .instructions {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h3 {
+            color: #00ff88;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .instructions p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #a1a1aa;
+        }
+        
+        .instructions kbd {
+            background: #1a1a2e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            border: 1px solid #3f3f46;
+        }
+        
+        /* Test Matrix */
+        .test-matrix {
+            background: #0f1629;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .test-matrix h3 {
+            font-size: 14px;
+            color: #e4e4e7;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #2d3748;
+            padding-bottom: 8px;
+        }
+        
+        .test-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #1a1a2e;
+        }
+        
+        .test-row:last-child { border-bottom: none; }
+        
+        .test-checkbox {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            accent-color: #00ff88;
+        }
+        
+        .test-label {
+            flex: 1;
+            font-size: 13px;
+        }
+        
+        .test-fps {
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            min-width: 60px;
+            text-align: right;
+        }
+        
+        .test-fps.recorded {
+            color: #00ff88;
+            font-weight: 600;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #2d3748;
+            color: #e4e4e7;
+        }
+        
+        .btn-secondary:hover {
+            background: #3f3f46;
+        }
+        
+        /* Back link */
+        .back-link {
+            display: block;
+            text-align: center;
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+            margin-top: 20px;
+        }
+        
+        .back-link:hover { text-decoration: underline; }
+        
+        /* System info */
+        .system-info {
+            font-size: 11px;
+            color: #52525b;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 3D Viewport -->
+        <div id="viewport">
+            <div class="fps-overlay">
+                <div class="fps-value fps-green" id="fps-display">--</div>
+                <div class="fps-label">FPS</div>
+            </div>
+        </div>
+
+        <!-- Side Panel -->
+        <div class="side-panel">
+            <h1>🚀 Orbrya Test</h1>
+            <p class="subtitle">N4000 Chromebook Performance Validation</p>
+            
+            <div class="tree-count">
+                <div class="value" id="tree-count">25</div>
+                <div class="label">TREES</div>
+            </div>
+            
+            <div class="instructions">
+                <h3>📋 Instructions</h3>
+                <p>
+                    Press <kbd>T</kbd> to cycle tree counts.<br>
+                    Watch FPS change as complexity increases.<br>
+                    Click checkboxes to record your results.
+                </p>
+            </div>
+            
+            <div class="test-matrix">
+                <h3>📊 Test Matrix</h3>
+                
+                <div class="test-row">
+                    <input type="checkbox" class="test-checkbox" id="test-25">
+                    <span class="test-label">25 trees (baseline)</span>
+                    <span class="test-fps" id="fps-25">___ FPS</span>
+                </div>
+                
+                <div class="test-row">
+                    <input type="checkbox" class="test-checkbox" id="test-50">
+                    <span class="test-label">50 trees</span>
+                    <span class="test-fps" id="fps-50">___ FPS</span>
+                </div>
+                
+                <div class="test-row">
+                    <input type="checkbox" class="test-checkbox" id="test-100">
+                    <span class="test-label">100 trees</span>
+                    <span class="test-fps" id="fps-100">___ FPS</span>
+                </div>
+                
+                <div class="test-row">
+                    <input type="checkbox" class="test-checkbox" id="test-175">
+                    <span class="test-label">175 trees (target)</span>
+                    <span class="test-fps" id="fps-175">___ FPS</span>
+                </div>
+                
+                <div class="test-row">
+                    <input type="checkbox" class="test-checkbox" id="test-300">
+                    <span class="test-label">300 trees (stress)</span>
+                    <span class="test-fps" id="fps-300">___ FPS</span>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" id="btn-record">
+                📝 Record Current FPS
+            </button>
+            
+            <button class="btn btn-secondary" id="btn-copy">
+                📋 Copy Results
+            </button>
+            
+            <a href="index.html" class="back-link">← Back to Full IDE</a>
+            
+            <div class="system-info" id="system-info">
+                Loading system info...
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js Import Map -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+
+        // Minimal SceneController for test page
+        class TestScene {
+            constructor(container) {
+                this.container = container;
+                this.currentTreeCount = 25;
+                this.currentFps = 0;
+                this.frameCount = 0;
+                this.lastFpsTime = performance.now();
+                
+                this.init();
+            }
+
+            init() {
+                // Scene
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(0x0a0a14);
+
+                // Camera
+                this.camera = new THREE.PerspectiveCamera(60, 
+                    this.container.clientWidth / this.container.clientHeight, 0.1, 1000);
+                this.camera.position.set(0, 30, 60);
+
+                // Renderer - N4000 optimized
+                this.renderer = new THREE.WebGLRenderer({ 
+                    antialias: false,
+                    powerPreference: 'low-power'
+                });
+                this.renderer.setPixelRatio(1.0);
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+                this.container.appendChild(this.renderer.domElement);
+
+                // Lighting
+                this.scene.add(new THREE.AmbientLight(0x404050, 0.8));
+                const dirLight = new THREE.DirectionalLight(0xffffff, 1.0);
+                dirLight.position.set(50, 100, 50);
+                this.scene.add(dirLight);
+
+                // Ground
+                const ground = new THREE.Mesh(
+                    new THREE.PlaneGeometry(100, 100),
+                    new THREE.MeshLambertMaterial({ color: 0x2d5a3d })
+                );
+                ground.rotation.x = -Math.PI / 2;
+                this.scene.add(ground);
+
+                // Initial trees
+                this.spawnTrees(25);
+
+                // Resize handler
+                window.addEventListener('resize', () => this.onResize());
+                
+                // Start
+                this.animate();
+            }
+
+            spawnTrees(count) {
+                // Remove existing trees
+                this.scene.children = this.scene.children.filter(c => c.name !== 'trees');
+
+                // Create instanced mesh for trees (GPU instancing)
+                const trunkGeo = new THREE.CylinderGeometry(0.3, 0.5, 3, 6);
+                const trunkMat = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+                const foliageGeo = new THREE.ConeGeometry(2, 5, 6);
+                const foliageMat = new THREE.MeshLambertMaterial({ color: 0x228b22 });
+
+                const trunkMesh = new THREE.InstancedMesh(trunkGeo, trunkMat, count);
+                const foliageMesh = new THREE.InstancedMesh(foliageGeo, foliageMat, count);
+                trunkMesh.name = 'trees';
+                foliageMesh.name = 'trees';
+
+                const dummy = new THREE.Object3D();
+                for (let i = 0; i < count; i++) {
+                    const x = (Math.random() - 0.5) * 90;
+                    const z = (Math.random() - 0.5) * 90;
+                    const scale = 0.8 + Math.random() * 0.6;
+
+                    // Trunk
+                    dummy.position.set(x, 1.5 * scale, z);
+                    dummy.scale.set(scale, scale, scale);
+                    dummy.updateMatrix();
+                    trunkMesh.setMatrixAt(i, dummy.matrix);
+
+                    // Foliage
+                    dummy.position.set(x, 5 * scale, z);
+                    dummy.updateMatrix();
+                    foliageMesh.setMatrixAt(i, dummy.matrix);
+                }
+
+                this.scene.add(trunkMesh);
+                this.scene.add(foliageMesh);
+                this.currentTreeCount = count;
+            }
+
+            onResize() {
+                this.camera.aspect = this.container.clientWidth / this.container.clientHeight;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.container.clientWidth, this.container.clientHeight);
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                
+                // Rotate camera
+                const time = performance.now() * 0.0002;
+                this.camera.position.x = Math.cos(time) * 60;
+                this.camera.position.z = Math.sin(time) * 60;
+                this.camera.lookAt(0, 5, 0);
+
+                // FPS calculation
+                this.frameCount++;
+                const now = performance.now();
+                if (now - this.lastFpsTime >= 500) {
+                    this.currentFps = Math.round((this.frameCount / (now - this.lastFpsTime)) * 1000);
+                    this.frameCount = 0;
+                    this.lastFpsTime = now;
+                    updateFpsDisplay(this.currentFps);
+                }
+
+                this.renderer.render(this.scene, this.camera);
+            }
+        }
+
+        // Initialize scene
+        const viewport = document.getElementById('viewport');
+        const scene = new TestScene(viewport);
+
+        // Tree count cycle
+        const treeCounts = [25, 50, 100, 175, 300];
+        let currentIndex = 0;
+
+        // UI update functions
+        function updateFpsDisplay(fps) {
+            const el = document.getElementById('fps-display');
+            el.textContent = fps;
+            el.className = 'fps-value ' + (fps >= 45 ? 'fps-green' : fps >= 30 ? 'fps-yellow' : 'fps-red');
+        }
+
+        function updateTreeCount(count) {
+            document.getElementById('tree-count').textContent = count;
+        }
+
+        // Keyboard handler
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 't' || e.key === 'T') {
+                currentIndex = (currentIndex + 1) % treeCounts.length;
+                const count = treeCounts[currentIndex];
+                scene.spawnTrees(count);
+                updateTreeCount(count);
+            }
+        });
+
+        // Record button
+        document.getElementById('btn-record').addEventListener('click', () => {
+            const count = scene.currentTreeCount;
+            const fps = scene.currentFps;
+            const fpsEl = document.getElementById(`fps-${count}`);
+            const checkEl = document.getElementById(`test-${count}`);
+            
+            if (fpsEl) {
+                fpsEl.textContent = `${fps} FPS`;
+                fpsEl.classList.add('recorded');
+            }
+            if (checkEl) checkEl.checked = true;
+        });
+
+        // Copy results
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            const results = treeCounts.map(c => {
+                const el = document.getElementById(`fps-${c}`);
+                return `${c} trees: ${el?.textContent || 'N/A'}`;
+            }).join('\n');
+            
+            const text = `Orbrya N4000 Test Results\n${new Date().toISOString()}\n\n${results}`;
+            navigator.clipboard.writeText(text);
+            alert('Results copied to clipboard!');
+        });
+
+        // System info
+        const sysInfo = document.getElementById('system-info');
+        sysInfo.innerHTML = `
+            <strong>System:</strong><br>
+            Cores: ${navigator.hardwareConcurrency || 'N/A'}<br>
+            Memory: ${navigator.deviceMemory || 'N/A'} GB<br>
+            Platform: ${navigator.platform}
+        `;
+    </script>
+</body>
+</html>

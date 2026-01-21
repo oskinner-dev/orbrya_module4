@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scenario UI Test - Orbrya</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f1629 0%, #1a2744 100%);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #667eea;
+        }
+        
+        .test-controls {
+            max-width: 800px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .test-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .test-btn-purple {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .test-btn-yellow {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            color: #0a0a14;
+        }
+        
+        .test-btn-green {
+            background: linear-gradient(135deg, #00ff88 0%, #00d4aa 100%);
+            color: #0a0a14;
+        }
+        
+        .test-btn-red {
+            background: linear-gradient(135deg, #ff4757 0%, #c0392b 100%);
+            color: white;
+        }
+        
+        .test-btn-gray {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+        
+        .console {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .console-line {
+            margin: 5px 0;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .console-info { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+        .console-success { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .console-warning { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+        .console-error { background: rgba(255, 71, 87, 0.2); color: #ff4757; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Scenario UI Component Test</h1>
+    
+    <div class="test-controls">
+        <button class="test-btn test-btn-purple" onclick="testInspector()">
+            📋 Show Inspector
+        </button>
+        <button class="test-btn test-btn-purple" onclick="hideInspector()">
+            ❌ Hide Inspector
+        </button>
+        <button class="test-btn test-btn-yellow" onclick="testHintButton()">
+            💡 Show Hint Button
+        </button>
+        <button class="test-btn test-btn-yellow" onclick="testHint(1)">
+            💡 Show Hint #1
+        </button>
+        <button class="test-btn test-btn-yellow" onclick="testHint(2)">
+            💡 Show Hint #2
+        </button>
+        <button class="test-btn test-btn-yellow" onclick="testHint(3)">
+            💡 Show Hint #3
+        </button>
+        <button class="test-btn test-btn-green" onclick="testSuccess()">
+            🎉 Show Success
+        </button>
+        <button class="test-btn test-btn-red" onclick="testError()">
+            ⚠️ Show Error
+        </button>
+        <button class="test-btn test-btn-red" onclick="testTryAgain()">
+            🔄 Show Try Again
+        </button>
+        <button class="test-btn test-btn-gray" onclick="testReset()">
+            🔄 Reset All
+        </button>
+        <button class="test-btn test-btn-gray" onclick="pulseHint()">
+            ✨ Pulse Hint
+        </button>
+    </div>
+    
+    <div class="console" id="console">
+        <div class="console-line console-info">ScenarioUI Test Page Loaded</div>
+    </div>
+
+    <script type="module">
+        import { ScenarioUI } from './src/scenarios/ui/ScenarioUI.js';
+        
+        // Initialize UI
+        const ui = new ScenarioUI();
+        ui.init();
+        
+        // Make ui globally accessible for testing
+        window.scenarioUI = ui;
+        
+        // Set up hints
+        ui.setHints([
+            { level: 1, text: "🤔 Look at line 27. What happens when a while loop has 'true' as its condition? It never stops!" },
+            { level: 2, text: "💡 You need to replace 'true' with a condition that checks the tree count. Think: 'while treeCount is less than some number...'" },
+            { level: 3, text: "✅ Try this: while (treeCount < 50). This tells the loop to stop after 50 trees are spawned." }
+        ]);
+        
+        // Set up callbacks
+        ui.setCallbacks({
+            onHintRequest: () => log('info', 'Hint requested'),
+            onTryAgain: () => log('warning', 'Try again clicked'),
+            onNextScenario: () => log('success', 'Next scenario clicked'),
+            onBackToDashboard: () => log('info', 'Back to dashboard clicked'),
+            onInspectorDismiss: (action) => log('info', `Inspector dismissed: ${action}`)
+        });
+        
+        log('success', 'ScenarioUI initialized successfully!');
+        
+        // Test functions
+        window.testInspector = function() {
+            ui.showInspector({
+                intro: "🌲 THE INFINITE FOREST 🌲\n\nWelcome to the Forest Simulation! I'm the AI assistant who built this environment.\n\nUnfortunately, I made a mistake in my tree-spawning code...",
+                problem: "The loop runs forever with 'while (true)', spawning thousands of trees until the game crashes! This is called an INFINITE LOOP.",
+                goal: "Add a proper stopping condition to the while loop so the forest has a reasonable number of trees (around 50) and runs smoothly at 45+ FPS."
+            });
+            log('info', 'Inspector shown');
+        };
+        
+        window.hideInspector = function() {
+            ui.hideInspector();
+            log('info', 'Inspector hidden');
+        };
+        
+        window.testHintButton = function() {
+            ui.showHintButton();
+            log('info', 'Hint button shown');
+        };
+        
+        window.testHint = function(num) {
+            const hints = [
+                "🤔 Look at line 27. What happens when a while loop has 'true' as its condition? It never stops!",
+                "💡 You need to replace 'true' with a condition that checks the tree count. Think: 'while treeCount is less than some number...'",
+                "✅ Try this: while (treeCount < 50). This tells the loop to stop after 50 trees are spawned."
+            ];
+            ui.showHint(num, hints[num - 1]);
+            log('info', `Hint #${num} shown`);
+        };
+        
+        window.testSuccess = function() {
+            ui.showSuccess({
+                message: "🎉 EXCELLENT WORK!\n\nYou fixed the infinite loop! The forest now has a reasonable number of trees and the game runs smoothly.\n\nYou're becoming a great AI code auditor!",
+                fps: 58,
+                time: 145,
+                attempts: 3,
+                hintsUsed: 1,
+                score: 85
+            });
+            log('success', 'Success modal shown');
+        };
+        
+        window.testError = function() {
+            ui.showError("That's not quite right. The loop still runs forever!");
+            log('error', 'Error toast shown');
+        };
+        
+        window.testTryAgain = function() {
+            ui.showTryAgain();
+            log('warning', 'Try again button shown');
+        };
+        
+        window.testReset = function() {
+            ui.reset();
+            log('info', 'UI reset');
+        };
+        
+        window.pulseHint = function() {
+            ui.showHintButton();
+            ui.pulseHintButton();
+            log('info', 'Hint button pulsing');
+        };
+        
+        // Console logging
+        function log(type, message) {
+            const console = document.getElementById('console');
+            const line = document.createElement('div');
+            line.className = `console-line console-${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(line);
+            console.scrollTop = console.scrollHeight;
+        }
+        
+        window.log = log;
+    </script>
+</body>
+</html>
