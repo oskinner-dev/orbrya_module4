@@ -449,6 +449,108 @@
         .scenario-card:nth-child(3) { animation-delay: 0.2s; }
         .scenario-card:nth-child(4) { animation-delay: 0.25s; }
         .scenario-card:nth-child(5) { animation-delay: 0.3s; }
+
+        /* Module Cards */
+        .modules-section {
+            margin-bottom: 48px;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .module-coding::before {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+        }
+
+        .module-prompt::before {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+        }
+
+        .module-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .module-icon {
+            font-size: 42px;
+            flex-shrink: 0;
+        }
+
+        .module-info {
+            flex: 1;
+        }
+
+        .module-info h3 {
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .module-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .module-tag {
+            display: inline-block;
+            background: rgba(102, 126, 234, 0.15);
+            color: var(--accent-primary);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .module-prompt .module-tag {
+            background: rgba(74, 222, 128, 0.15);
+            color: #4ade80;
+        }
+
+        .module-arrow {
+            font-size: 24px;
+            color: var(--text-muted);
+            transition: transform 0.2s, color 0.2s;
+        }
+
+        .module-card:hover .module-arrow {
+            transform: translateX(4px);
+            color: var(--accent-primary);
+        }
     </style>
 </head>
 <body>
@@ -493,6 +595,33 @@
             </div>
         </section>
 
+
+        <!-- Module Selection -->
+        <section class="modules-section">
+            <div class="section-header">
+                <h2 class="section-title">Learning Modules</h2>
+            </div>
+            <div class="module-grid">
+                <a href="index.html" class="module-card module-coding">
+                    <div class="module-icon">🔧</div>
+                    <div class="module-info">
+                        <h3>Code Debugging</h3>
+                        <p>Find and fix bugs in AI-generated code. Learn optimization and constraint-setting.</p>
+                        <span class="module-tag">Modules 1-3</span>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </a>
+                <a href="prompt-quest.html" class="module-card module-prompt">
+                    <div class="module-icon">💬</div>
+                    <div class="module-info">
+                        <h3>Prompt Quest</h3>
+                        <p>Chat with AI spirits to build worlds. Learn that specificity matters when talking to AI!</p>
+                        <span class="module-tag">Module 4 • NEW</span>
+                    </div>
+                    <span class="module-arrow">→</span>
+                </a>
+            </div>
+        </section>
 
         <!-- Available Scenarios -->
         <section class="scenarios-section">

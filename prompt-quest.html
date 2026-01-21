@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Quest - Orbrya</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-darkest: #0d0d1a;
+            --bg-dark: #1a1a2e;
+            --bg-panel: #16213e;
+            --bg-card: #1f2b47;
+            --accent-primary: #667eea;
+            --accent-secondary: #764ba2;
+            --success: #00ff88;
+            --warning: #ffa500;
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --border-color: #2d3748;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-darkest);
+            color: var(--text-primary);
+        }
+
+        body {
+            background: 
+                radial-gradient(ellipse at 30% 0%, rgba(102, 126, 234, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 100%, rgba(118, 75, 162, 0.15) 0%, transparent 50%),
+                linear-gradient(180deg, #0a0a14 0%, #0d0d1a 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(22, 33, 62, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .back-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--success) 0%, #00d4aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .module-badge {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 24px 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* World Grid */
+        .worlds-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 24px 60px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .world-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .world-card {
+            background: linear-gradient(145deg, var(--bg-card), var(--bg-panel));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .world-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--card-accent, var(--accent-primary));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .world-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--card-accent, var(--accent-primary));
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                        0 0 60px var(--card-glow, rgba(102, 126, 234, 0.15));
+        }
+
+        .world-card:hover::before {
+            opacity: 1;
+        }
+
+        .world-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .world-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-host {
+            font-size: 13px;
+            color: var(--accent-primary);
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .card-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .card-tag {
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .card-status {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--success);
+        }
+
+        .status-progress {
+            background: rgba(255, 165, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .status-locked {
+            background: rgba(255,255,255,0.1);
+            color: var(--text-muted);
+        }
+
+        /* How it Works */
+        .how-section {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .how-section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 24px;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+        }
+
+        .how-step {
+            text-align: center;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin: 0 auto 16px;
+        }
+
+        .how-step h3 {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .how-step p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 32px; }
+            .world-grid { grid-template-columns: 1fr; }
+            .how-grid { grid-template-columns: 1fr; gap: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="dashboard.html" class="back-btn">← Dashboard</a>
+            <div class="logo">ORBRYA</div>
+            <span class="module-badge">Module 4</span>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-icon">💬</div>
+        <h1>Prompt Quest</h1>
+        <p>
+            Learn the art of talking to AI. Chat with creative spirits who build worlds from your words—but they take everything literally! Master the skill of clear communication.
+        </p>
+    </section>
+
+    <section class="worlds-section">
+        <h2 class="section-title">Choose Your World</h2>
+        <div class="world-grid" id="world-grid">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <section class="how-section">
+        <h2>How Prompt Quest Works</h2>
+        <div class="how-grid">
+            <div class="how-step">
+                <div class="step-number">1</div>
+                <h3>Chat Naturally</h3>
+                <p>Talk to AI spirits like you'd text a friend. Describe what you want them to create.</p>
+            </div>
+            <div class="how-step">
+                <div class="step-number">2</div>
+                <h3>See Results</h3>
+                <p>Watch as the spirit interprets your words—sometimes perfectly, sometimes hilariously wrong!</p>
+            </div>
+            <div class="how-step">
+                <div class="step-number">3</div>
+                <h3>Learn Precision</h3>
+                <p>Discover that specificity matters. The clearer you speak, the better AI understands.</p>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { AuthManager } from './src/portal/AuthManager.js';
+
+        // Check auth
+        if (!AuthManager.isLoggedIn()) {
+            window.location.href = 'login.html';
+        }
+
+        // World definitions
+        const worlds = [
+            {
+                id: 'forest',
+                icon: '🌲',
+                name: 'Forest Builder',
+                host: 'Fernie the Forest Spirit',
+                description: 'Create forests, groves, and woodland scenes. Learn how numbers, adjectives, and arrangement words affect your results.',
+                tags: ['Beginner', '5-10 min'],
+                accentColor: '#22c55e',
+                glowColor: 'rgba(34, 197, 94, 0.15)',
+                status: 'new',
+                locked: false,
+                url: 'prompt-quest-play.html?world=forest'
+            },
+            {
+                id: 'character',
+                icon: '🧙',
+                name: 'Character Creator',
+                host: 'Pixel the Portrait Artist',
+                description: 'Design heroes, villains, and NPCs. Master describing appearance, personality, and style.',
+                tags: ['Beginner', '10-15 min'],
+                accentColor: '#8b5cf6',
+                glowColor: 'rgba(139, 92, 246, 0.15)',
+                status: 'new',
+                locked: false,
+                url: 'prompt-quest-play.html?world=character'
+            },
+            {
+                id: 'room',
+                icon: '🏠',
+                name: 'Room Designer',
+                host: 'Deco the Interior Spirit',
+                description: 'Furnish rooms and design spaces. Practice spatial language and aesthetic descriptions.',
+                tags: ['Intermediate', '10-15 min'],
+                accentColor: '#f59e0b',
+                glowColor: 'rgba(245, 158, 11, 0.15)',
+                status: null,
+                locked: false,
+                url: 'prompt-quest-play.html?world=room'
+            },
+            {
+                id: 'creature',
+                icon: '🐉',
+                name: 'Creature Lab',
+                host: 'Morph the Mad Scientist',
+                description: 'Invent fantastical beasts and monsters. Combine features and attributes creatively.',
+                tags: ['Intermediate', '15-20 min'],
+                accentColor: '#ef4444',
+                glowColor: 'rgba(239, 68, 68, 0.15)',
+                status: null,
+                locked: false,
+                url: 'prompt-quest-play.html?world=creature'
+            },
+            {
+                id: 'vehicle',
+                icon: '🚀',
+                name: 'Vehicle Workshop',
+                host: 'Gears the Mechanic',
+                description: 'Build cars, ships, and spacecraft. Learn technical vs. creative descriptions.',
+                tags: ['Advanced', '15-20 min'],
+                accentColor: '#06b6d4',
+                glowColor: 'rgba(6, 182, 212, 0.15)',
+                status: 'locked',
+                locked: true,
+                url: '#'
+            },
+            {
+                id: 'story',
+                icon: '📖',
+                name: 'Story Weaver',
+                host: 'Sage the Narrator',
+                description: 'Craft plot elements and story beats. Advanced prompt chaining and context.',
+                tags: ['Advanced', '20-30 min'],
+                accentColor: '#ec4899',
+                glowColor: 'rgba(236, 72, 153, 0.15)',
+                status: 'locked',
+                locked: true,
+                url: '#'
+            }
+        ];
+
+        // Render world cards
+        const grid = document.getElementById('world-grid');
+        grid.innerHTML = worlds.map(world => {
+            const statusBadge = world.status === 'new' ? '<span class="card-status status-new">NEW</span>' :
+                               world.status === 'progress' ? '<span class="card-status status-progress">In Progress</span>' :
+                               world.locked ? '<span class="card-status status-locked">🔒 Locked</span>' : '';
+            
+            return `
+                <a href="${world.locked ? '#' : world.url}" 
+                   class="world-card ${world.locked ? 'locked' : ''}"
+                   style="--card-accent: ${world.accentColor}; --card-glow: ${world.glowColor}">
+                    ${statusBadge}
+                    <div class="card-icon">${world.icon}</div>
+                    <div class="card-title">${world.name}</div>
+                    <div class="card-host">with ${world.host}</div>
+                    <div class="card-description">${world.description}</div>
+                    <div class="card-meta">
+                        ${world.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}
+                    </div>
+                </a>
+            `;
+        }).join('');
+    </script>
+</body>
+</html>
