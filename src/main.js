@@ -17,6 +17,7 @@ import { Hierarchy } from './ui/Hierarchy.js';
 import { ProfilingTestSuite } from './utils/ProfilingTestSuite.js';
 import { ScenarioManager } from './scenarios/ScenarioManager.js';
 import { ScenarioTestRunner } from './utils/ScenarioTestRunner.js';
+import { PromptInterface } from './ui/PromptInterface.js';
 
 class OrbryaEngine {
     constructor() {
@@ -28,6 +29,7 @@ class OrbryaEngine {
         this.hierarchy = null;
         this.scenarioManager = null;
         this.scenarioTestRunner = null;
+        this.promptInterface = null;
         this.liteMode = false;
     }
 
@@ -106,6 +108,10 @@ class OrbryaEngine {
         
         // Initialize Test Runner (available via window.testRunner)
         this.scenarioTestRunner = new ScenarioTestRunner(this);
+        
+        // Initialize Prompt Interface (Module 4 - Natural Language)
+        this.updateLoadingStatus('Loading AI chat interface...');
+        this.promptInterface = new PromptInterface(this.panelManager, this.sceneController);
         
         // Start render loop
         this.sceneController.start();

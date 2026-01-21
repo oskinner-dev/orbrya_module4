@@ -220,6 +220,27 @@ export class SceneController {
         console.log(`[Trees] ${count} trees = 2 draw calls (GPU Instancing)`);
     }
 
+    /**
+     * Remove all trees from the scene
+     */
+    clearTrees() {
+        if (this.treeInstancedMesh) {
+            if (this.treeInstancedMesh.trunk) {
+                this.scene.remove(this.treeInstancedMesh.trunk);
+                this.treeInstancedMesh.trunk.geometry.dispose();
+                this.treeInstancedMesh.trunk.material.dispose();
+            }
+            if (this.treeInstancedMesh.foliage) {
+                this.scene.remove(this.treeInstancedMesh.foliage);
+                this.treeInstancedMesh.foliage.geometry.dispose();
+                this.treeInstancedMesh.foliage.material.dispose();
+            }
+            this.treeInstancedMesh = null;
+        }
+        this.currentTreeCount = 0;
+        console.log('[Trees] Cleared all trees');
+    }
+
 
     onResize() {
         const width = this.container.clientWidth;
